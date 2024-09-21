@@ -1,0 +1,83 @@
+We are following this type of structure 
+
+
+lib/
+│
+├── main.dart                          # App entry point
+├── core/                              # Core logic and services used globally across the app
+│   ├── constants/                     # Global constants (strings, assets paths, etc.)
+│   │   └── app_constants.dart         # App-wide constants (e.g., route names, API keys)
+│   │   └── assets.dart                # Asset paths like images and icons
+│   │   └── colors.dart                # App color palette
+│   │   └── typography.dart            # Text styles, font sizes, etc.
+│   ├── utils/                         # Utility functions/helpers
+│   │   └── date_time_helper.dart      # Date/time formatting functions
+│   │   └── validator.dart             # Form input validators
+│   │   └── api_response_parser.dart   # Helper for parsing API responses
+│   ├── theme/                         # Theme-related configurations
+│   │   └── app_theme.dart             # Main theme file (Light/Dark theme)
+│   ├── services/                      # Global app services like API, notifications, etc.
+│       └── api_service.dart           # Service handling API calls
+│       └── local_storage_service.dart # Service handling local storage (e.g., SharedPreferences)
+│       └── notification_service.dart  # Service handling notifications
+│       └── auth_service.dart          # Authentication service for login/signup
+│
+├── features/                          # Grouping of app features by functionality
+│   ├── authentication/                # Feature module for Authentication
+│   │   ├── data/                      # Data-related classes (API, local storage)
+│   │   │   └── auth_api.dart          # API calls for login/signup
+│   │   ├── models/                    # Models related to authentication
+│   │   │   └── user_model.dart        # User data model
+│   │   ├── providers/                 # State management for authentication
+│   │   │   └── auth_provider.dart     # Provider handling authentication state
+│   │   ├── ui/                        # UI components related to authentication
+│   │   │   └── login_screen.dart      # Login screen UI
+│   │   │   └── signup_screen.dart     # Signup screen UI
+│   │   ├── widgets/                   # Reusable widgets for authentication
+│   │   │   └── login_form.dart        # Login form widget
+│
+│   ├── user_profile/                  # Feature module for user profile management
+│   │   ├── data/                      # Data-related classes (API, local storage)
+│   │   │   └── user_profile_api.dart  # API calls to fetch/update user profile
+│   │   ├── models/                    # Models related to user profile
+│   │   │   └── user_profile.dart      # User profile model
+│   │   ├── providers/                 # State management for user profile
+│   │   │   └── user_profile_provider.dart  # Provider handling profile state
+│   │   ├── ui/                        # UI components related to user profile
+│   │   │   └── profile_screen.dart    # User profile screen
+│   │   ├── widgets/                   # Reusable widgets for user profile
+│   │       └── profile_avatar.dart    # Widget for showing profile picture
+│
+│   ├── chat/                          # Feature module for chat functionality
+│   │   ├── data/                      # Data-related classes (API, socket, database)
+│   │   │   └── chat_api.dart          # API calls for chat messages
+│   │   ├── models/                    # Models related to chat
+│   │   │   └── chat_message.dart      # Chat message data model
+│   │   ├── providers/                 # State management for chat
+│   │   │   └── chat_provider.dart     # Provider handling chat state
+│   │   ├── ui/                        # UI components for chat feature
+│   │   │   └── chat_screen.dart       # Chat screen
+│   │   ├── widgets/                   # Reusable widgets for chat
+│   │       └── message_bubble.dart    # Message bubble widget
+│
+├── shared/                            # Shared UI components and reusable code
+│   ├── widgets/                       # General reusable widgets used across multiple features
+│   │   └── custom_button.dart         # Custom button widget used throughout the app
+│   │   └── loading_spinner.dart       # Loading spinner widget
+│   ├── modals/                        # Shared modals and dialogs
+│   │   └── error_dialog.dart          # Error dialog modal
+│
+├── providers/                         # Global app-wide providers
+│   └── theme_provider.dart            # Theme management for dark/light mode
+│   └── language_provider.dart         # Localization or language change provider
+│
+├── routes/                            # Routing configuration
+│   └── app_routes.dart                # Centralized route management
+│
+├── repositories/                      # Data repositories for complex data handling
+│   └── user_repository.dart           # User repository for managing user-related data access
+│   └── chat_repository.dart           # Chat repository for managing chat-related data
+│
+├── l10n/                              # Localization files
+│   └── app_en.arb                     # Localization for English
+│   └── app_es.arb                     # Localization for Spanish
