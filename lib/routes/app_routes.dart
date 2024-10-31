@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ogo/features/authentication/ui/login_screen.dart';
-import 'package:ogo/features/authentication/ui/register_screen.dart';
+import 'package:ogo/features/authentication/ui/login_screen_ui.dart';
+import 'package:ogo/features/authentication/ui/register_screen_ui.dart';
 import 'package:ogo/features/splash/ui/splash_screen.dart';
 
 class AppRoutes {
@@ -8,6 +8,7 @@ class AppRoutes {
   static const homepage = '/homepage';
   static const login = '/login';
   static const register = '/register';
+  static const test = '/test';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -17,6 +18,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => LoginScreen());
       case register:
         return MaterialPageRoute(builder: (_) => RegisterScreen());
+      case test:
+        return MaterialPageRoute(builder: (_) => const  Placeholder());
       // case homepage:
       //   return MaterialPageRoute(
       //     builder: (context) => HomePage(),
