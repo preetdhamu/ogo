@@ -13,17 +13,21 @@ class Obutton extends StatefulWidget {
   final double? borderRadius;
   final EdgeInsetsGeometry? padding;
   final String? img;
+  double? width;
+  double? height;
 
-  const Obutton({
+  Obutton({
     Key? key,
     required this.text,
     required this.onPressed,
     this.color = OAppColors.darkBlue, // Default button color
     this.textColor = Colors.white, // Default text color
-    this.fontSize = 20.0, // Default font size
+    this.fontSize = 18, // Default font size
     this.borderRadius = 8.0, // Default border radius
     this.img,
     this.padding = const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+    this.width,
+    this.height,
   }) : super(key: key);
 
   @override
@@ -36,8 +40,8 @@ class _ObuttonState extends State<Obutton> {
     return GestureDetector(
       onTap: widget.onPressed,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.85,
-        height: MediaQuery.of(context).size.height * 0.06,
+        width: widget.width ?? MediaQuery.of(context).size.width * 0.85,
+        height: widget.height ?? MediaQuery.of(context).size.height * 0.06,
         decoration: BoxDecoration(
           color: widget.color,
           border: Border.all(color: OAppColors.secondary, width: 1.0),

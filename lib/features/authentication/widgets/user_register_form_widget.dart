@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:ogo/core/constants/colors.dart';
 import 'package:ogo/core/utils/validator.dart';
 import 'package:ogo/features/authentication/providers/auth_service_provider.dart';
-import 'package:ogo/main.dart';
+
 import 'package:ogo/routes/app_routes.dart';
 import 'package:ogo/shared/widgets/custom_button.dart';
 import 'package:ogo/shared/widgets/custom_error_dailog.dart';
@@ -61,7 +59,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                   Oheader(
                     text: AppLocalizations.of(context)!.signupHeader,
                     lines: 2,
-                    fontSize: 30,
+                    fontSize: 22,
                     fontWeight: FontWeight.w700,
                     glow: true,
                     textAlign: TextAlign.center,
@@ -124,7 +122,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     text: AppLocalizations.of(context)!.signupHeader,
                     color: OAppColors.secondry2,
                     onPressed: () async {
-                      bool result = false;
+                      
                       // Handle button press
                       if (_formKey.currentState!.validate()) {
                         // Calling the API
@@ -135,13 +133,15 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                           "password": passwordController.text.trim(),
                         };
                         Oshowlog("Sign Up Form Parms", parms.toString());
-                        await provider.registerUser(parms).then((value) {
+                        await provider.registerUser(parms, context ).then((value) {
                           if (value) {
-                            navigatorKey.currentState
-                                ?.pushReplacementNamed(AppRoutes.login);
+                            
+                             Navigator.pushNamedAndRemoveUntil(
+                                context, AppRoutes.homepage, (Route<dynamic> route) => false,)  ;
                           } else {
-                            navigatorKey.currentState
-                                ?.pushReplacementNamed(AppRoutes.register);
+                          
+                                 Navigator.pushReplacementNamed(
+                                context, AppRoutes.register);
                           }
                         });
                       } else {
@@ -154,6 +154,9 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(
+              height: 5,
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 10.0),

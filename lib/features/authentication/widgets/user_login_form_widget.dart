@@ -41,7 +41,7 @@ class _UserLoginFormState extends State<UserLoginForm> {
                 Oheader(
                   text: AppLocalizations.of(context)!.loginHeader,
                   lines: 2,
-                  fontSize: 30,
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
                   glow: true,
                   textAlign: TextAlign.center,
@@ -83,9 +83,18 @@ class _UserLoginFormState extends State<UserLoginForm> {
                       };
 
                       Oshowlog("Login Up Form Parms :", parms.toString());
-                      await provider.loginUser(parms, context);
+                      await provider.loginUser(parms, context).then(
+                        (value) {
+                          if (value) {
+                            Navigator.pushReplacementNamed(
+                                context, AppRoutes.homepage);
+                          } else {
+                            Navigator.pushReplacementNamed(
+                                context, AppRoutes.splash);
+                          }
+                        },
+                      );
                     } else {
-                    
                       OshowInfoDialog(context, "Form is Not Valid", "Error",
                           errorIcon: Icons.close);
                     }

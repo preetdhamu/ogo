@@ -1,0 +1,4 @@
+class OAppConstants {
+  static const String tvdbKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZDhhYjBjMGY2MGNlYjA4ZmQzNzA2YTg5NWM2NzJmOSIsIm5iZiI6MTczMDU1NTU5Ni45OTA2NjQsInN1YiI6IjY3MjYxZWM3ZTcyNTg0OGExOTNhYjk4YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.p8RBTsarB-A0VAnFaFTTC9w0Ot2GQzqLHSciIadviI0';
+  
+}

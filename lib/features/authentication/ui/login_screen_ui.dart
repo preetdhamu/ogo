@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:ogo/core/constants/assets.dart';
 import 'package:ogo/core/constants/colors.dart';
 
+
 import 'package:ogo/features/authentication/widgets/user_login_form_widget.dart';
 import 'package:ogo/routes/app_routes.dart';
 
 import 'package:ogo/shared/widgets/custom_icon_button.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

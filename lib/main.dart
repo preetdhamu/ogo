@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:ogo/core/services/local_storage_service.dart';
 import 'package:ogo/core/theme/app_theme.dart';
 import 'package:ogo/providers/manage_all_providers.dart';
 import 'package:ogo/routes/app_routes.dart';
@@ -12,6 +14,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+    await Hive.initFlutter();
+    await OHiveName().openAllBoxes();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -56,8 +60,6 @@ Future main() async {
   }
 }
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -68,8 +70,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: OAppTheme.lightTheme, // For light Theme
       // darkTheme: OAppTheme.darkTheme ,  // for dark theme
-      initialRoute: AppRoutes.splash,
-      navigatorKey: navigatorKey,
+      initialRoute: AppRoutes.homepage,
       debugShowCheckedModeBanner: false,
       onGenerateRoute: AppRoutes.generateRoute,
       localizationsDelegates: const [

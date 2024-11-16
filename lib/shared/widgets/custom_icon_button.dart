@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class OiconButtons extends StatefulWidget {
   final Widget? child;
   final Function()? onTap;
+  bool? extra = true  ;
 
-  const OiconButtons({
+  OiconButtons({
     Key? key,
     required this.child,
     required this.onTap,
+    this.extra,
   }) : super(key: key);
 
   @override
@@ -23,7 +25,8 @@ class _OiconButtonsState extends State<OiconButtons> {
       child: Container(
         padding: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2), // Frosted glass background effect
+          color:
+              Colors.white.withOpacity(0.2), // Frosted glass background effect
           borderRadius: BorderRadius.circular(50.0),
           boxShadow: [
             BoxShadow(
@@ -32,7 +35,8 @@ class _OiconButtonsState extends State<OiconButtons> {
               blurRadius: 10,
             ),
             BoxShadow(
-              color: Colors.white.withOpacity(0.2), // Inner glow for frosted effect
+              color: Colors.white
+                  .withOpacity(0.2), // Inner glow for frosted effect
               offset: Offset(-4, -4),
               blurRadius: 10,
             ),
@@ -42,13 +46,17 @@ class _OiconButtonsState extends State<OiconButtons> {
           borderRadius: BorderRadius.circular(50.0),
           child: BackdropFilter(
             filter: ImageFilter.blur(
-              sigmaX: 10.0, sigmaY: 10.0), // Frosted glass blur effect
+                sigmaX: 10.0, sigmaY: 10.0), // Frosted glass blur effect
             child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2), // Slight background color for clarity
-                shape: BoxShape.circle,
-              ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+              decoration: widget.extra == true 
+                  ? BoxDecoration(
+                      color: Colors.white.withOpacity(
+                          0.2), // Slight background color for clarity
+                      shape: BoxShape.circle,
+                    )
+                  : null,
               child: widget.child,
             ),
           ),
