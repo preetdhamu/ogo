@@ -21,7 +21,7 @@ class HomePageProvider extends ChangeNotifier {
   LikeMovieModel? likeMovieModel;
   TopRatingMovies? topRatingMovies;
   NowPlayingMovies? nowPlayingMovies;
-  bool selectGenre = true;
+  bool selectGenre = true ;
 
   AuthServiceProvider? authServiceProvider;
   // loading(bool value) {
@@ -60,18 +60,18 @@ class HomePageProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkLikeGenre() async {
+  Future<void> checkLikeGenre() async {
     Box genreMoviesBox = Hive.box(OHiveName.genremovies);
     List name = genreMoviesBox.get("genreMovies", defaultValue: []);
     Oshowlog1(name.toString());
 
     if (name.isEmpty) {
       selectGenre = true;
-      return selectGenre;
+      await getGenre();
     } else {
       selectGenre = false;
-      return selectGenre;
     }
+    notifyListeners();
   }
 
   void saveLikeGenre() {

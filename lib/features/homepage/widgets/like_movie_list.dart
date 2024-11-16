@@ -28,7 +28,7 @@ class _LikeMoviesState extends State<LikeMovies> {
   void initState() {
     super.initState();
     Oshowlog1("${AuthAPI.userdetails.toString()}");
-    Oshowlog1("Calling other api's ");
+    Oshowlog1("Calling other api's 123 ");
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         try {
@@ -36,9 +36,10 @@ class _LikeMoviesState extends State<LikeMovies> {
               Provider.of<HomePageProvider>(context, listen: false);
           provider.checkLikeGenre().then(
             (value) {
-              if (value == true) {
-                provider.getGenre();
-              }
+              // if (value == true) {
+              //   Oshowlog1("Called Successfully ! ");
+              //   provider.getGenre();
+              // }
             },
           );
         } on Exception catch (e) {

@@ -61,6 +61,7 @@ dependencies:
   hive: ^2.2.3
   page_view_dot_indicator: ^2.3.0
   cached_network_image: ^3.4.1
+   
 
 
 

@@ -16,10 +16,11 @@ import 'package:ogo/shared/widgets/custom_button.dart';
 import 'package:ogo/shared/widgets/custom_glass_morphism.dart';
 import 'package:ogo/shared/widgets/custom_icon_button.dart';
 import 'package:ogo/shared/widgets/custom_log.dart';
+import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
+// import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
 import '../../../shared/widgets/custom_header.dart';
 
@@ -45,6 +46,7 @@ class _MainContentState extends State<MainContent> {
   final PageController _pageController = PageController(viewportFraction: 0.4);
   @override
   void initState() {
+    currentPage = 0;
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback(
@@ -54,14 +56,14 @@ class _MainContentState extends State<MainContent> {
               Provider.of<HomePageProvider>(context, listen: false);
 
           if (!provider.load) {
-            // provider.getGenre();
-
-            await Future.wait([
-              provider.getNowPlayingMovies(pageNumberforApi),
-              provider.getTopRatingMovies(pageNumberforApi),
-
-              ///////////// n number of api should be called
-            ]);
+            List<Future> items = [];
+            items.add(provider.getNowPlayingMovies(pageNumberforApi));
+            items.add(provider.getTopRatingMovies(pageNumberforApi));
+            if (provider.selectGenre == false) {
+              items.add(provider.getGenre());
+            }
+            Oshowlog("asdadasdcxcvbghfghf", "${items.length}");
+            await Future.wait(items);
           }
         } on Exception catch (e) {
           Oshowlog1("$e");
@@ -77,10 +79,20 @@ class _MainContentState extends State<MainContent> {
       const Duration(seconds: 5),
       (timer) {
         if (_pageController.hasClients) {
-          currentPage = (currentPage + 1) % (20);
-          _pageController.animateToPage(currentPage,
+          final maxPages = Provider.of<HomePageProvider>(context, listen: false)
+                  .topRatingMovies
+                  ?.results
+                  ?.length ??
+              0;
+
+          if (maxPages > 0) {
+            currentPage = (currentPage + 1) % maxPages;
+            _pageController.animateToPage(
+              currentPage,
               duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut);
+              curve: Curves.easeInOut,
+            );
+          }
         }
       },
     );
@@ -97,22 +109,6 @@ class _MainContentState extends State<MainContent> {
   Widget build(BuildContext context) {
     return Consumer2<AuthServiceProvider, HomePageProvider>(
       builder: (context, authProvider, homeProvider, _) {
-        if (homeProvider.load == false) {
-          totalItems = homeProvider.topRatingMovies?.results?.length ?? 0;
-          maxVisibleDots = 5;
-
-          if (totalItems == 0) {
-            // Handle edge case where there are no items
-            startIndex = 0;
-            visibleDotsCount = 0;
-          } else {
-            startIndex = (currentPage - (maxVisibleDots ~/ 2)).clamp(
-                0, (totalItems - maxVisibleDots).clamp(0, totalItems - 1));
-            visibleDotsCount =
-                totalItems < maxVisibleDots ? totalItems : maxVisibleDots;
-          }
-        }
-
         return homeProvider.load || authProvider.load
             ? const CircularProgressIndicator()
             : SingleChildScrollView(
@@ -157,7 +153,11 @@ class _MainContentState extends State<MainContent> {
                                   top: 100,
                                   right: 10,
                                   child: OiconButtons(
-                                      child: Icon(Icons.logout),
+                                      child: Icon(
+                                        Icons.logout,
+                                        color: OAppColors.white,
+                                        size: 13,
+                                      ),
                                       onTap: () async {
                                         await authProvider.authService
                                             .signOut();
@@ -267,80 +267,106 @@ class _MainContentState extends State<MainContent> {
                           const SizedBox(
                             height: 5,
                           ),
-                          SizedBox(
-                            height: 75,
-                            child: PageView.builder(
-                              controller: _pageController,
-                              scrollDirection: Axis.horizontal,
-                              onPageChanged: (value) {
-                                setState(() {
-                                  currentPage = value;
-                                });
-                              },
-                              itemCount: totalItems,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 2.0, horizontal: 5.0),
-                                  child: Container(
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            34, 68, 131, 0.698),
-                                        borderRadius:
-                                            BorderRadius.circular(7.0)),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(7.0),
-                                      child: CachedNetworkImage(
-                                        progressIndicatorBuilder:
-                                            (context, url, progress) => Center(
-                                          child: CircularProgressIndicator(
-                                            value: progress.progress,
+                          homeProvider.topRatingMovies?.results?.isNotEmpty ??
+                                  false
+                              ? SizedBox(
+                                  height: 75,
+                                  child: PageView.builder(
+                                    controller: _pageController,
+                                    scrollDirection: Axis.horizontal,
+                                    onPageChanged: (value) {
+                                      setState(() {
+                                        currentPage = value;
+                                      });
+                                    },
+                                    itemCount: homeProvider
+                                            .topRatingMovies?.results?.length ??
+                                        0,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 2.0, horizontal: 5.0),
+                                        child: Container(
+                                          width: 50,
+                                          decoration: BoxDecoration(
+                                              color: const Color.fromRGBO(
+                                                  34, 68, 131, 0.698),
+                                              borderRadius:
+                                                  BorderRadius.circular(7.0)),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                            child: CachedNetworkImage(
+                                              progressIndicatorBuilder:
+                                                  (context, url, progress) =>
+                                                      Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: progress.progress,
+                                                ),
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return Image.asset(
+                                                  OImage.defaultImage,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                              fadeInDuration: const Duration(
+                                                  milliseconds: 300),
+                                              fadeOutDuration: const Duration(
+                                                  milliseconds: 300),
+                                              imageUrl:
+                                                  "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies?.results?[index].posterPath}",
+                                              fit: BoxFit.fitWidth,
+                                            ),
                                           ),
                                         ),
-                                        errorWidget: (context, url, error) {
-                                          return Image.asset(
-                                            OImage.defaultImage,
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                        fadeInDuration:
-                                            const Duration(milliseconds: 300),
-                                        fadeOutDuration:
-                                            const Duration(milliseconds: 300),
-                                        imageUrl:
-                                            "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies?.results?[index].posterPath}",
-                                        fit: BoxFit.fitWidth,
-                                      ),
-                                    ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
-                          ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(
                             height: 5,
                           ),
-                          PageViewDotIndicator(
-                            currentItem: currentPage,
-                            // currentItem: (currentPage - startIndex),
-                            count:
-                                homeProvider.topRatingMovies?.results?.length ??
-                                    0,
-                            unselectedColor: OAppColors.darkBlue,
-                            selectedColor: OAppColors.secondary,
-                            boxShape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(7.0),
-                            size: const Size(20.0, 5.0),
-                            unselectedSize: const Size(18.0, 5.0),
-                            duration: const Duration(milliseconds: 300),
-                            onItemClicked: (index) {
-                              // int targetPage = startIndex + index;
-                              _pageController.animateToPage(index,
+                          if (homeProvider.topRatingMovies?.results != null &&
+                              homeProvider
+                                  .topRatingMovies!.results!.isNotEmpty &&
+                              currentPage >= 0 &&
+                              currentPage <
+                                  homeProvider
+                                      .topRatingMovies!.results!.length) ...[
+                            Center(
+                              child: SizedBox(
+                                width: 120,
+                                child: PageViewDotIndicator(
+                                  currentItem: currentPage,
+                                  count: homeProvider
+                                          .topRatingMovies?.results?.length ??
+                                      0,
+                                  unselectedColor: OAppColors.darkBlue,
+                                  selectedColor: OAppColors.secondary,
+                                  boxShape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(7.0),
+                                  size: const Size(20.0, 5.0),
+                                  unselectedSize: const Size(18.0, 5.0),
                                   duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
-                            },
-                          ),
+                                  onItemClicked: (index) {
+                                    // int targetPage = startIndex + index;
+                                    _pageController.animateToPage(index,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ] else ... [
+                            const Center(
+                              child: Icon(Icons.add , size: 12 , color:  OAppColors.white,),
+                            )
+                          ]
                         ],
                       ),
                     ),
@@ -525,11 +551,11 @@ class _MainContentState extends State<MainContent> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Oheader(
+                                Oheader(
                                   overflow: TextOverflow.ellipsis,
                                   text: 'For You',
                                   glow: true,
@@ -537,7 +563,7 @@ class _MainContentState extends State<MainContent> {
                                   color: OAppColors.white,
                                   fontWeight: FontWeight.w800,
                                 ),
-                                const Oheader(
+                                Oheader(
                                   overflow: TextOverflow.ellipsis,
                                   text: "See All",
                                   fontSize: 18,
