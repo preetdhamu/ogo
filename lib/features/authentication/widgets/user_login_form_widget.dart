@@ -87,10 +87,10 @@ class _UserLoginFormState extends State<UserLoginForm> {
                         (value) {
                           if (value) {
                             Navigator.pushReplacementNamed(
-                                context, AppRoutes.homepage);
+                                context, OAppRoutes.homepage);
                           } else {
                             Navigator.pushReplacementNamed(
-                                context, AppRoutes.splash);
+                                context, OAppRoutes.splash);
                           }
                         },
                       );
@@ -130,7 +130,8 @@ class _UserLoginFormState extends State<UserLoginForm> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushReplacementNamed(context, AppRoutes.register);
+                    Navigator.pushReplacementNamed(
+                        context, OAppRoutes.register);
                   },
                   child: Oheader(
                     text: AppLocalizations.of(context)!.signupHeader,

@@ -122,7 +122,6 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                     text: AppLocalizations.of(context)!.signupHeader,
                     color: OAppColors.secondry2,
                     onPressed: () async {
-                      
                       // Handle button press
                       if (_formKey.currentState!.validate()) {
                         // Calling the API
@@ -133,15 +132,18 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                           "password": passwordController.text.trim(),
                         };
                         Oshowlog("Sign Up Form Parms", parms.toString());
-                        await provider.registerUser(parms, context ).then((value) {
+                        await provider
+                            .registerUser(parms, context)
+                            .then((value) {
                           if (value) {
-                            
-                             Navigator.pushNamedAndRemoveUntil(
-                                context, AppRoutes.homepage, (Route<dynamic> route) => false,)  ;
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              OAppRoutes.homepage,
+                              (Route<dynamic> route) => false,
+                            );
                           } else {
-                          
-                                 Navigator.pushReplacementNamed(
-                                context, AppRoutes.register);
+                            Navigator.pushReplacementNamed(
+                                context, OAppRoutes.register);
                           }
                         });
                       } else {
@@ -176,7 +178,7 @@ class _UserRegisterFormState extends State<UserRegisterForm> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                      Navigator.pushReplacementNamed(context, OAppRoutes.login);
                     },
                     child: Oheader(
                       text: AppLocalizations.of(context)!.loginHeader,

@@ -54,7 +54,7 @@ class AuthServiceProvider extends ChangeNotifier {
             context, "Authorization Token Failed ! ", "Login Error:");
         notifyListeners();
 
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        Navigator.pushReplacementNamed(context, OAppRoutes.login);
       }
     } catch (e, s) {
       Oshowlog("Token Passing Error", '${e.toString()} ${s.toString()}');
@@ -68,7 +68,7 @@ class AuthServiceProvider extends ChangeNotifier {
       FirebaseAuth.instance.authStateChanges().listen(
         (User? user) async {
           if (user == null) {
-            Navigator.pushReplacementNamed(context, AppRoutes.splash);
+            Navigator.pushReplacementNamed(context, OAppRoutes.splash);
           } else {
             currentuser = user;
             await getIdToken(context);

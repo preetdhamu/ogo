@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,10 @@ import 'package:ogo/features/homepage/provider/home_page_provider.dart';
 import 'package:ogo/features/homepage/ui/home_page.dart';
 
 import 'package:ogo/routes/app_routes.dart';
+import 'package:ogo/routes/app_routes_home.dart';
 import 'package:ogo/shared/widgets/custom_button.dart';
 import 'package:ogo/shared/widgets/custom_glass_morphism.dart';
+import 'package:ogo/shared/widgets/custom_grid_view_unequal.dart';
 import 'package:ogo/shared/widgets/custom_icon_button.dart';
 import 'package:ogo/shared/widgets/custom_log.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
@@ -34,7 +37,6 @@ class MainContent extends StatefulWidget {
 }
 
 class _MainContentState extends State<MainContent> {
-  int pageNumberforApi = 1;
   int currentPage = 0;
   Timer? _timer;
   int totalItems = 0;
@@ -57,8 +59,8 @@ class _MainContentState extends State<MainContent> {
 
           if (!provider.load) {
             List<Future> items = [];
-            items.add(provider.getNowPlayingMovies(pageNumberforApi));
-            items.add(provider.getTopRatingMovies(pageNumberforApi));
+            items.add(provider.getNowPlayingMovies());
+            items.add(provider.getTopRatingMovies());
             if (provider.selectGenre == false) {
               items.add(provider.getGenre());
             }
@@ -109,8 +111,13 @@ class _MainContentState extends State<MainContent> {
   Widget build(BuildContext context) {
     return Consumer2<AuthServiceProvider, HomePageProvider>(
       builder: (context, authProvider, homeProvider, _) {
-        return homeProvider.load || authProvider.load
-            ? const CircularProgressIndicator()
+        return homeProvider.load ||
+                authProvider.load ||
+                homeProvider.nowplayingmovieload
+            ? const Center(
+                child: CircularProgressIndicator(
+                color: red,
+              ))
             : SingleChildScrollView(
                 child: Column(
                   children: [
@@ -162,12 +169,12 @@ class _MainContentState extends State<MainContent> {
                                         await authProvider.authService
                                             .signOut();
                                         Navigator.pushNamed(
-                                            context, AppRoutes.splash);
+                                            context, OAppRoutes.splash);
                                       })),
                               Positioned(
                                   bottom: 0,
                                   left: 0,
-                                  child: GlassMorphism(
+                                  child: OGlassMorphism(
                                     width: MediaQuery.of(context).size.width,
                                     blur: 1,
                                     color: OAppColors.black,
@@ -362,184 +369,20 @@ class _MainContentState extends State<MainContent> {
                                 ),
                               ),
                             ),
-                          ] else ... [
+                          ] else ...[
                             const Center(
-                              child: Icon(Icons.add , size: 12 , color:  OAppColors.white,),
+                              child: Icon(
+                                Icons.add,
+                                size: 12,
+                                color: OAppColors.white,
+                              ),
                             )
                           ]
                         ],
                       ),
                     ),
                     const SizedBox(
-                      height: 5,
-                    ),
-                    //// Now Playing In threaters
-                    SizedBox(
-                      height: 255,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Oheader(
-                                      overflow: TextOverflow.ellipsis,
-                                      text: 'Now Playing',
-                                      glow: true,
-                                      fontSize: 22,
-                                      color: OAppColors.white,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4.0),
-                                      child: Oheader(
-                                        overflow: TextOverflow.ellipsis,
-                                        text:
-                                            '(${homeProvider?.nowPlayingMovies?.dates?.minimum} - ${homeProvider?.nowPlayingMovies?.dates?.maximum})',
-                                        glow: true,
-                                        fontSize: 12,
-                                        color:
-                                            OAppColors.white.withOpacity(0.5),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Oheader(
-                                  overflow: TextOverflow.ellipsis,
-                                  text: "See All",
-                                  fontSize: 18,
-                                  color: OAppColors.secondary,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: homeProvider
-                                        ?.nowPlayingMovies?.results?.length ??
-                                    0,
-                                itemBuilder: (context, index) {
-                                  return Stack(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 7.0),
-                                        width: 145,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          color: red,
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          child: CachedNetworkImage(
-                                            progressIndicatorBuilder:
-                                                (context, url, progress) =>
-                                                    Center(
-                                              child: CircularProgressIndicator(
-                                                value: progress.progress,
-                                              ),
-                                            ),
-                                            errorWidget: (context, url, error) {
-                                              return Image.asset(
-                                                OImage.defaultImage,
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                            fadeInDuration: const Duration(
-                                                milliseconds: 300),
-                                            fadeOutDuration: const Duration(
-                                                milliseconds: 300),
-                                            imageUrl:
-                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?.results?[index].posterPath}",
-                                            fit: BoxFit.fitWidth,
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 5,
-                                        left: 12,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              height: 18,
-                                              width: 25,
-                                              decoration: BoxDecoration(
-                                                  color: red,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          5.0)),
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Oheader(
-                                              overflow: TextOverflow.ellipsis,
-                                              text:
-                                                  "${homeProvider.nowPlayingMovies?.results?[index].voteAverage}",
-                                              glow: true,
-                                              fontSize: 14,
-                                              color: OAppColors.white,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Categories
-                    SizedBox(
-                      height: 255,
-                      width: MediaQuery.of(context).size.width,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Oheader(
-                              overflow: TextOverflow.ellipsis,
-                              text: 'Categories',
-                              glow: true,
-                              fontSize: 22,
-                              color: OAppColors.white,
-                              fontWeight: FontWeight.w800,
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-
-                            /// UnSize Boxes
-                          ],
-                        ),
-                      ),
+                      height: 10,
                     ),
 
                     // For You Section
@@ -579,9 +422,8 @@ class _MainContentState extends State<MainContent> {
                               height: 200,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: homeProvider
-                                        ?.nowPlayingMovies?.results?.length ??
-                                    0,
+                                itemCount:
+                                    homeProvider?.nowPlayingMovies?.length ?? 0,
                                 itemBuilder: (context, index) {
                                   return Stack(
                                     children: [
@@ -616,7 +458,7 @@ class _MainContentState extends State<MainContent> {
                                             fadeOutDuration: const Duration(
                                                 milliseconds: 300),
                                             imageUrl:
-                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?.results?[index].posterPath}",
+                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?[index].posterPath}",
                                             fit: BoxFit.fitWidth,
                                           ),
                                         ),
@@ -641,7 +483,251 @@ class _MainContentState extends State<MainContent> {
                                             Oheader(
                                               overflow: TextOverflow.ellipsis,
                                               text:
-                                                  "${homeProvider.nowPlayingMovies?.results?[index].voteAverage}",
+                                                  "${homeProvider.nowPlayingMovies?[index].voteAverage}",
+                                              glow: true,
+                                              fontSize: 14,
+                                              color: OAppColors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Categories
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Oheader(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: 'Categories',
+                                  glow: true,
+                                  fontSize: 22,
+                                  color: OAppColors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                Oheader(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: "See All",
+                                  fontSize: 18,
+                                  color: OAppColors.secondary,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+
+                            /// UnSize Boxes
+                            OGridViewUnequal(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              items: 6,
+                              builder: (context, index) {
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.48,
+                                      height: (index % 5 + 2) *
+                                          30, // Random heights for demonstration
+                                      child: Image.asset(
+                                        homeProvider?.likeMovieModel
+                                                ?.genre_images[index] ??
+                                            OImage.defaultImage,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 5,
+                                      left: 8,
+                                      child: OGlassMorphism(
+                                        blur: 1,
+                                        color: OAppColors.black,
+                                        opacity: 0.6,
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5.0, vertical: 1.0),
+                                          child: Oheader(
+                                            overflow: TextOverflow.ellipsis,
+                                            text:
+                                                '${homeProvider.likeMovieModel?.genres?[index]?.name}'
+                                                    .toUpperCase(),
+                                            fontSize: 14,
+                                            color: OAppColors.white,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    //// Now Playing In threaters
+                    SizedBox(
+                      height: 255,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Hero(
+                                      transitionOnUserGestures: true,
+                                      tag: "nowPlaying",
+                                      child: Oheader(
+                                        overflow: TextOverflow.ellipsis,
+                                        text: 'Now Playing',
+                                        glow: true,
+                                        fontSize: 22,
+                                        color: OAppColors.white,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Oheader(
+                                        overflow: TextOverflow.ellipsis,
+                                        text:
+                                            '(${homeProvider?.minimumDate} - ${homeProvider?.maximumDate})',
+                                        glow: true,
+                                        fontSize: 12,
+                                        color:
+                                            OAppColors.white.withOpacity(0.5),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                        context, OAppRoutesHome.allMovies);
+                                  },
+                                  child: const Oheader(
+                                    overflow: TextOverflow.ellipsis,
+                                    text: "See All",
+                                    fontSize: 18,
+                                    color: OAppColors.secondary,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    homeProvider?.nowPlayingMovies?.length ?? 0,
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 7.0),
+                                        width: 145,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(7.0),
+                                          color: red,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(7.0),
+                                          child: CachedNetworkImage(
+                                            progressIndicatorBuilder:
+                                                (context, url, progress) =>
+                                                    Center(
+                                              child: CircularProgressIndicator(
+                                                value: progress.progress,
+                                              ),
+                                            ),
+                                            errorWidget: (context, url, error) {
+                                              return Image.asset(
+                                                OImage.defaultImage,
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                            fadeInDuration: const Duration(
+                                                milliseconds: 300),
+                                            fadeOutDuration: const Duration(
+                                                milliseconds: 300),
+                                            imageUrl:
+                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?[index].posterPath}",
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 5,
+                                        left: 12,
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              height: 18,
+                                              width: 25,
+                                              decoration: BoxDecoration(
+                                                  color: red,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.0)),
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Oheader(
+                                              overflow: TextOverflow.ellipsis,
+                                              text:
+                                                  "${homeProvider.nowPlayingMovies?[index].voteAverage}",
                                               glow: true,
                                               fontSize: 14,
                                               color: OAppColors.white,

@@ -67,7 +67,7 @@ class _LikeMoviesState extends State<LikeMovies> {
                                 (value) {
                                   if (value) {
                                     Navigator.pushReplacementNamed(
-                                        context, AppRoutes.splash);
+                                        context, OAppRoutes.splash);
                                   } else {
                                     Navigator.pushReplacement(
                                       context,

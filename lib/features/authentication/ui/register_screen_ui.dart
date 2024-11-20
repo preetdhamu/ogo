@@ -59,7 +59,7 @@ class RegisterScreen extends StatelessWidget {
                               ),
                               onTap: () {
                                 Navigator.pushReplacementNamed(
-                                    context, AppRoutes.splash);
+                                    context, OAppRoutes.splash);
                               }),
                         ),
                         Positioned(
@@ -74,7 +74,7 @@ class RegisterScreen extends StatelessWidget {
                               ),
                               onTap: () {
                                 Navigator.pushReplacementNamed(
-                                    context, AppRoutes.login);
+                                    context, OAppRoutes.login);
                               }),
                         ),
                       ],

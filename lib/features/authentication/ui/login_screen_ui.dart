@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:ogo/core/constants/assets.dart';
 import 'package:ogo/core/constants/colors.dart';
 
-
 import 'package:ogo/features/authentication/widgets/user_login_form_widget.dart';
 import 'package:ogo/routes/app_routes.dart';
 
@@ -57,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       onTap: () {
                         Navigator.pushReplacementNamed(
-                            context, AppRoutes.splash);
+                            context, OAppRoutes.splash);
                       }),
                 ),
                 Positioned(
@@ -71,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       onTap: () {
                         Navigator.pushReplacementNamed(
-                            context, AppRoutes.register);
+                            context, OAppRoutes.register);
                       }),
                 ),
               ],

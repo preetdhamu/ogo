@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class GlassMorphism extends StatelessWidget {
-  const GlassMorphism(
+class OGlassMorphism extends StatelessWidget {
+  const OGlassMorphism(
       {Key? key,
       required this.child,
       required this.blur,
@@ -11,6 +11,7 @@ class GlassMorphism extends StatelessWidget {
       this.margin,
       this.width,
       this.height,
+      this.padding,
       this.borderRadius})
       : super(key: key);
   final Widget child;
@@ -20,7 +21,7 @@ class GlassMorphism extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? margin;
-
+final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
 
   @override
@@ -32,6 +33,7 @@ class GlassMorphism extends StatelessWidget {
           width: width,
           height: height,
           margin: margin,
+          padding: padding,
           decoration: BoxDecoration(
               color: color.withOpacity(opacity), borderRadius: borderRadius),
           child: child,

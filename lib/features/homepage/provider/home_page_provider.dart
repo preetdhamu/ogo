@@ -20,8 +20,12 @@ class HomePageProvider extends ChangeNotifier {
   Map? currentUserDetails;
   LikeMovieModel? likeMovieModel;
   TopRatingMovies? topRatingMovies;
-  NowPlayingMovies? nowPlayingMovies;
-  bool selectGenre = true ;
+  List<Results> nowPlayingMovies = [];
+  bool selectGenre = true;
+  bool hasMoreNowPlaying = true;
+  int currentPage = 1;
+  String minimumDate = '';
+  String maximumDate = '';
 
   AuthServiceProvider? authServiceProvider;
   // loading(bool value) {
@@ -96,7 +100,7 @@ class HomePageProvider extends ChangeNotifier {
   }
 
   Future<void> getGenre() async {
-    if (load) return; // Avoid reloading if already loading
+    // if (load) return; // Avoid reloading if already loading
     loading(true); // Start loading
 
     try {
@@ -123,7 +127,7 @@ class HomePageProvider extends ChangeNotifier {
   }
 
   // Top Rating Movies
-  Future<void> getTopRatingMovies(int pageNumber) async {
+  Future<void> getTopRatingMovies({int pageNumber = 1}) async {
     // if (load) return; // Avoid reloading if already loading
     loading(true); // Start loading
 
@@ -131,6 +135,7 @@ class HomePageProvider extends ChangeNotifier {
       Map allgenre = await AuthAPIHomePage.getAllTopRatingMovies(pageNumber);
       if (allgenre['success'] == true) {
         topRatingMovies = allgenre['res'];
+
         Oshowlog(allgenre['res'].toString(), "Top Rating Movies Model");
       } else {
         Oshowlog1(allgenre['res'].toString());
@@ -142,15 +147,44 @@ class HomePageProvider extends ChangeNotifier {
     }
   }
 
+  resetNowPlayingMovies() {
+    currentPage = 1;
+    nowPlayingMovies.clear();
+    minimumDate = '';
+    maximumDate = '';
+    hasMoreNowPlaying = false;
+    // notifyListeners();
+  }
+
+  bool nowplayingmovieload = false;
+
   // Top Rating Movies
-  Future<void> getNowPlayingMovies(int pageNumber) async {
-    if (load) return; // Avoid reloading if already loading
-    loading(true); // Start loading
+  Future<void> getNowPlayingMovies({int pageNumber = 1}) async {
+    // if (load) return; // Avoid reloading if already loading
+    // loading(true);
+    nowplayingmovieload = true;
+    notifyListeners(); // Start loading
 
     try {
       Map allgenre = await AuthAPIHomePage.getAllNowPlayingMovies(pageNumber);
       if (allgenre['success'] == true) {
-        nowPlayingMovies = allgenre['res'];
+        NowPlayingMovies data = allgenre['res'];
+
+        if (data.results?.isNotEmpty ?? false) {
+          if (data.page == 1) {
+            resetNowPlayingMovies();
+            nowPlayingMovies = data.results!;
+          } else {
+            nowPlayingMovies.addAll(data.results!);
+          }
+          Oshowlog("asdsdgghgfcbcdfg ", nowPlayingMovies.length.toString());
+          minimumDate = data.dates?.minimum ?? '';
+          maximumDate = data.dates?.maximum ?? '';
+          hasMoreNowPlaying = data.page! < data.totalPages!;
+        } else {
+          hasMoreNowPlaying = false;
+        }
+
         Oshowlog(allgenre['res'].toString(), "Now Playing Movies Model");
       } else {
         Oshowlog1(allgenre['res'].toString());
@@ -158,7 +192,26 @@ class HomePageProvider extends ChangeNotifier {
     } catch (e) {
       Oshowlog("Now Playing Movie Error:", e.toString());
     } finally {
-      loading(false); // Stop loading
+      // loading(false); // Stop loading
+      nowplayingmovieload = false;
+      notifyListeners();
+      Oshowlog1("Appi completed processing ");
+      notifyListeners();
     }
+  }
+
+  int selectedNavigationScreen = 0;
+
+  void selectScreen(int value) {
+    if (value >= 0 && value < 5) {
+      selectedNavigationScreen = value;
+      notifyListeners();
+    }
+  }
+
+  int incrementPageCount() {
+    currentPage = currentPage + 1;
+    notifyListeners();
+    return currentPage;
   }
 }

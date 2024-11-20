@@ -11,9 +11,11 @@ class OAppColors {
   static const Color subprimary = Color.fromRGBO(34, 68, 131, 1);
   static const Color darkBlue = Color.fromRGBO(34, 68, 131, 0.7);
   static const Color secondary = Color(0xFF4AB9FF);
+  static const Color blue = Color.fromARGB(255, 0, 76, 255);
 
   static const Color secondry2 = Color.fromRGBO(45, 164, 251, 1);
   static const Color gray = Color(0xFF303D4F);
+  static const Color green = Color.fromARGB(255, 38, 255, 0);
   static const Color grey = Colors.grey;
   static const Color white = Color.fromARGB(255, 255, 255, 255);
   static const Color lightwhite = Color.fromRGBO(124, 138, 159, 1);

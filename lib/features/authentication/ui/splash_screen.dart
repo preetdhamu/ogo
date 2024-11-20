@@ -105,7 +105,7 @@ class SplashScreen extends StatelessWidget {
                     Obutton(
                       text: AppLocalizations.of(context)!.loginHeader,
                       onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.login);
+                        Navigator.pushNamed(context, OAppRoutes.login);
                       },
                       textColor: Colors.white,
                       borderRadius: 12.0,
@@ -142,7 +142,7 @@ class SplashScreen extends StatelessWidget {
                       color: OAppColors.secondry2,
                       onPressed: () {
                         Navigator.pushReplacementNamed(
-                            context, AppRoutes.register);
+                            context, OAppRoutes.register);
                       },
                       textColor: Colors.white,
                       borderRadius: 12.0,

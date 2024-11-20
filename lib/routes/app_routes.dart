@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ogo/features/authentication/ui/login_screen_ui.dart';
 import 'package:ogo/features/authentication/ui/register_screen_ui.dart';
+import 'package:ogo/features/homepage/ui/all_movies.dart';
 import 'package:ogo/features/homepage/ui/home_page.dart';
 import 'package:ogo/features/authentication/ui/splash_screen.dart';
 
-class AppRoutes {
+class OAppRoutes {
   static const splash = '/splash';
   static const homepage = '/homepage';
+
 
   static const login = '/login';
   static const register = '/register';
@@ -22,6 +24,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => RegisterScreen());
       case homepage:
         return MaterialPageRoute(builder: (_) => HomePage());
+      
       case test:
         return MaterialPageRoute(builder: (_) => const Placeholder());
       // case homepage:

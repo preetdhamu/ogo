@@ -48,7 +48,7 @@ class AuthAPIHomePage {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       TopRatingMovies topRatingMovies = TopRatingMovies.fromJson(data);
-
+      
       return {
         "success": true,
         "res": topRatingMovies,

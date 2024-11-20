@@ -70,9 +70,9 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: OAppTheme.lightTheme, // For light Theme
       // darkTheme: OAppTheme.darkTheme ,  // for dark theme
-      initialRoute: AppRoutes.homepage,
+      initialRoute: OAppRoutes.homepage,
       debugShowCheckedModeBanner: false,
-      onGenerateRoute: AppRoutes.generateRoute,
+      onGenerateRoute: OAppRoutes.generateRoute,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
