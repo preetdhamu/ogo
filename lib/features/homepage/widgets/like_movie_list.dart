@@ -53,7 +53,9 @@ class _LikeMoviesState extends State<LikeMovies> {
   Widget build(BuildContext context) {
     return Consumer2<AuthServiceProvider, HomePageProvider>(
       builder: (context, authProvider, homeProvider, _) {
-        return homeProvider.load == true
+        return homeProvider.load == true ||
+                homeProvider.checkLikeGenrebool ||
+                homeProvider.getgenrebool
             ? const CircularProgressIndicator()
             : Stack(
                 children: [

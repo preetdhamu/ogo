@@ -64,6 +64,7 @@ class _ObuttonState extends State<Obutton> {
                     )
                   : const SizedBox.shrink(),
               Oheader(
+                overflow: TextOverflow.ellipsis,
                 text: widget.text,
                 fontSize: widget.fontSize,
                 fontFamily: OAppFonts.primary,

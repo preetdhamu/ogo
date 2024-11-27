@@ -15,6 +15,7 @@ class OAppColors {
 
   static const Color secondry2 = Color.fromRGBO(45, 164, 251, 1);
   static const Color gray = Color(0xFF303D4F);
+  static const Color lightgray = Color.fromARGB(255, 133, 157, 192);
   static const Color green = Color.fromARGB(255, 38, 255, 0);
   static const Color grey = Colors.grey;
   static const Color white = Color.fromARGB(255, 255, 255, 255);

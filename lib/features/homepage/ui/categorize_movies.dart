@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ogo/core/constants/api_endpoints.dart';
 import 'package:ogo/core/constants/assets.dart';
+import 'package:ogo/features/homepage/models/like_movie_model.dart';
 import 'package:ogo/features/homepage/provider/home_page_provider.dart';
 import 'package:ogo/routes/app_routes.dart';
 import 'package:ogo/shared/widgets/custom_header.dart';
@@ -10,14 +11,15 @@ import 'package:provider/provider.dart';
 
 import '../../../core/constants/colors.dart';
 
-class AllMovies extends StatefulWidget {
-  const AllMovies({super.key});
+class CategorizeMovies extends StatefulWidget {
+  final Genres genre;
+  const CategorizeMovies({super.key, required this.genre});
 
   @override
-  State<AllMovies> createState() => _AllMoviesState();
+  State<CategorizeMovies> createState() => _CategorizeMoviesState();
 }
 
-class _AllMoviesState extends State<AllMovies> {
+class _CategorizeMoviesState extends State<CategorizeMovies> {
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -29,15 +31,16 @@ class _AllMoviesState extends State<AllMovies> {
     // provider.getNowPlayingMovies(pageNumber: provider.currentPage + 1);
 
     // Add scroll listener for infinite scrolling
-    provider.getNowPlayingMovies(pageNumber: 1);
+    provider.getCategorizedMovies(widget.genre.id ?? 0, pageNumber: 1);
 
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
               scrollController.position.maxScrollExtent &&
-          provider.hasMoreNowPlaying &&
-          !provider.nowplayingmovieload) {
+          provider.hasMoreNowPlayingCategorizedMovies &&
+          !provider.categorizeMovieload) {
         provider
-            .getNowPlayingMovies(pageNumber: provider.incrementPageCount())
+            .getCategorizedMovies(widget.genre.id ?? 0,
+                pageNumber: provider.incrementPageCount())
             .whenComplete(
               () => Oshowlog1("Completed Loading NEw Data "),
             );
@@ -73,11 +76,11 @@ class _AllMoviesState extends State<AllMovies> {
               expandedHeight: 50,
               pinned: true,
               backgroundColor: OAppColors.primary.withOpacity(0.8),
-              flexibleSpace: const FlexibleSpaceBar(
+              flexibleSpace: FlexibleSpaceBar(
                 title: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
                   child: Oheader(
-                    text: 'Now Playing',
+                    text: "${widget.genre.name} Movies",
                     fontSize: 22,
                     glow: true,
                     lines: 2,
@@ -100,12 +103,12 @@ class _AllMoviesState extends State<AllMovies> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    if (index < provider.nowPlayingMovies.length) {
+                    if (index < provider.categorizedMovies.length) {
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context, rootNavigator: true).pushNamed(
                               OAppRoutes.moviedetail,
-                              arguments: provider.nowPlayingMovies[index].id);
+                              arguments: provider.categorizedMovies[index].id);
                         },
                         child: Stack(
                           children: [
@@ -133,7 +136,7 @@ class _AllMoviesState extends State<AllMovies> {
                                 fadeOutDuration:
                                     const Duration(milliseconds: 300),
                                 imageUrl:
-                                    "${OAppEndPoints.baseUrlfromDBImage}${provider.nowPlayingMovies[index].posterPath}",
+                                    "${OAppEndPoints.baseUrlfromDBImage}${provider.categorizedMovies[index].posterPath}",
                                 fit: BoxFit.fill,
                               ),
                             ),
@@ -156,7 +159,7 @@ class _AllMoviesState extends State<AllMovies> {
                                   Oheader(
                                     overflow: TextOverflow.ellipsis,
                                     text:
-                                        "${provider.nowPlayingMovies[index].voteAverage}",
+                                        "${provider.categorizedMovies[index].voteAverage}",
                                     glow: true,
                                     fontSize: 14,
                                     color: OAppColors.white,
@@ -177,8 +180,8 @@ class _AllMoviesState extends State<AllMovies> {
                       );
                     }
                   },
-                  childCount: provider.nowPlayingMovies.length +
-                      (provider.hasMoreNowPlaying ? 1 : 0),
+                  childCount: provider.categorizedMovies.length +
+                      (provider.hasMoreNowPlayingCategorizedMovies ? 1 : 0),
                 ),
               ),
             ),

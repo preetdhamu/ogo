@@ -1,6 +1,4 @@
 import 'package:ogo/core/constants/assets.dart';
-import 'package:ogo/shared/widgets/custom_log.dart';
-
 class LikeMovieModel {
   List<Genres>? genres;
 

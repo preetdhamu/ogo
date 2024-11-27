@@ -53,7 +53,7 @@ Future main() async {
         print("One or more environment variables are missing.");
         return;
       }
-      runApp(MultiProvider(providers: allproviders, child: const MyApp()));
+      runApp(MultiProvider(providers: allproviders, child: MyApp()));
     });
   } on Exception catch (e, s) {
     print("Error is : $e and $s");
@@ -61,12 +61,14 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "OGO",
+      navigatorKey: rootNavigatorKey,
       themeMode: ThemeMode.system,
       theme: OAppTheme.lightTheme, // For light Theme
       // darkTheme: OAppTheme.darkTheme ,  // for dark theme

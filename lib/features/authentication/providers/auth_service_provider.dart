@@ -44,31 +44,31 @@ class AuthServiceProvider extends ChangeNotifier {
         showHomePageContent = true;
         Oshowlog("Response from authorizeWithBackend",
             AuthAPI.userdetails['message'].toString());
-        notifyListeners();
       } else {
         // Show an error message if authorization fails
         await authService.signOut();
         Oshowlog1('Authorization failed');
         showHomePageContent = false;
-        OshowInfoDialog(
-            context, "Authorization Token Failed ! ", "Login Error:");
-        notifyListeners();
+        // OshowInfoDialog(
+        //     context, "Authorization Token Failed ! ", "Login Error:");
+        Oshowlog("Login Error : ", "Authorization Token Failed !");
 
-        Navigator.pushReplacementNamed(context, OAppRoutes.login);
+        // Navigator.pushReplacementNamed(context, OAppRoutes.login);
       }
     } catch (e, s) {
       Oshowlog("Token Passing Error", '${e.toString()} ${s.toString()}');
     } finally {
       loading();
+      notifyListeners();
     }
   }
 
-  void checkAuthentication(BuildContext context) {
+  void checkAuthentication(BuildContext context) async {
     try {
       FirebaseAuth.instance.authStateChanges().listen(
         (User? user) async {
           if (user == null) {
-            Navigator.pushReplacementNamed(context, OAppRoutes.splash);
+            await Navigator.pushReplacementNamed(context, OAppRoutes.splash);
           } else {
             currentuser = user;
             await getIdToken(context);
@@ -130,7 +130,7 @@ class AuthServiceProvider extends ChangeNotifier {
       if (user != null) {
         Oshowlog1("User Login Successfully By Google");
 
-        Navigator.pushReplacement(context, MaterialPageRoute(
+        await Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) {
             return HomePage();
           },
@@ -156,7 +156,7 @@ class AuthServiceProvider extends ChangeNotifier {
         //   AppRoutes.homepage,
         //   (Route<dynamic> route) => false,
         // );
-        Navigator.pushReplacement(context, MaterialPageRoute(
+        await Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) {
             return HomePage();
           },

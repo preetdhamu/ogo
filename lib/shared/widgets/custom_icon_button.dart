@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class OiconButtons extends StatefulWidget {
   final Widget? child;
   final Function()? onTap;
-  bool? extra = true  ;
+  bool? extra = true;
 
   OiconButtons({
     Key? key,
@@ -50,7 +50,7 @@ class _OiconButtonsState extends State<OiconButtons> {
             child: Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-              decoration: widget.extra == true 
+              decoration: widget.extra == true
                   ? BoxDecoration(
                       color: Colors.white.withOpacity(
                           0.2), // Slight background color for clarity

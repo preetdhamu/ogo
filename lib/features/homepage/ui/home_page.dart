@@ -92,10 +92,14 @@ class _HomePageState extends State<HomePage> {
         });
 
       case 1:
-        return const AllMovies();
+        return Container(
+          color: OAppColors.gray,
+          child: const Center(child: Oheader(text: "TV ")),
+        );
       case 2:
         return Container(
           color: OAppColors.gray,
+          child: const Center(child: Oheader(text: "TV ")),
         );
 
       case 3:

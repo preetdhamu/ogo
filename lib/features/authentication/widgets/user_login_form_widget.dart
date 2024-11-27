@@ -84,12 +84,12 @@ class _UserLoginFormState extends State<UserLoginForm> {
 
                       Oshowlog("Login Up Form Parms :", parms.toString());
                       await provider.loginUser(parms, context).then(
-                        (value) {
+                        (value) async {
                           if (value) {
-                            Navigator.pushReplacementNamed(
+                             await Navigator.pushReplacementNamed(
                                 context, OAppRoutes.homepage);
                           } else {
-                            Navigator.pushReplacementNamed(
+                            await Navigator.pushReplacementNamed(
                                 context, OAppRoutes.splash);
                           }
                         },

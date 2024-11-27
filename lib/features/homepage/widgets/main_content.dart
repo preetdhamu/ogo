@@ -61,6 +61,7 @@ class _MainContentState extends State<MainContent> {
             List<Future> items = [];
             items.add(provider.getNowPlayingMovies());
             items.add(provider.getTopRatingMovies());
+            items.add(provider.getNowPlayingTv());
             if (provider.selectGenre == false) {
               items.add(provider.getGenre());
             }
@@ -77,18 +78,31 @@ class _MainContentState extends State<MainContent> {
   }
 
   void startAutoScrolling() {
+    HomePageProvider provider =
+        Provider.of<HomePageProvider>(context, listen: false);
+
+    // Auto-scroll functionality
     _timer = Timer.periodic(
       const Duration(seconds: 5),
       (timer) {
         if (_pageController.hasClients) {
-          final maxPages = Provider.of<HomePageProvider>(context, listen: false)
-                  .topRatingMovies
-                  ?.results
-                  ?.length ??
-              0;
+          final maxPages = provider.topRatingMovies.length;
 
           if (maxPages > 0) {
-            currentPage = (currentPage + 1) % maxPages;
+            if (provider.hasMoreTopMovies == true &&
+                currentPage == maxPages - 5 &&
+                !provider.topratingMoviesload) {
+              provider
+                  .getTopRatingMovies(
+                      pageNumber: provider.incrementPageCountTopMovies())
+                  .whenComplete(
+                () {
+                  Oshowlog1("Completed Loading New Data");
+                  setState(() {});
+                },
+              );
+            }
+            currentPage = currentPage + 1;
             _pageController.animateToPage(
               currentPage,
               duration: const Duration(milliseconds: 300),
@@ -113,7 +127,8 @@ class _MainContentState extends State<MainContent> {
       builder: (context, authProvider, homeProvider, _) {
         return homeProvider.load ||
                 authProvider.load ||
-                homeProvider.nowplayingmovieload
+                homeProvider.nowplayingmovieload ||
+                homeProvider.getgenrebool
             ? const Center(
                 child: CircularProgressIndicator(
                 color: red,
@@ -123,7 +138,7 @@ class _MainContentState extends State<MainContent> {
                   children: [
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      height: 550,
+                      height: 480,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -131,14 +146,13 @@ class _MainContentState extends State<MainContent> {
                           Stack(
                             children: [
                               SizedBox(
-                                height: 450,
+                                height: 400,
                                 width: MediaQuery.of(context).size.width,
                                 child: CachedNetworkImage(
                                   progressIndicatorBuilder:
                                       (context, url, progress) => Center(
                                     child: CircularProgressIndicator(
-                                      value: progress.progress,
-                                    ),
+                                        value: progress.progress),
                                   ),
                                   errorWidget: (context, url, error) {
                                     return Image.asset(
@@ -152,132 +166,112 @@ class _MainContentState extends State<MainContent> {
                                   fadeOutDuration:
                                       const Duration(milliseconds: 300),
                                   imageUrl:
-                                      "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies?.results?[currentPage].posterPath}",
+                                      "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies[currentPage].posterPath}",
                                   fit: BoxFit.fill,
                                 ),
                               ),
                               Positioned(
-                                  top: 100,
-                                  right: 10,
-                                  child: OiconButtons(
-                                      child: Icon(
-                                        Icons.logout,
-                                        color: OAppColors.white,
-                                        size: 13,
-                                      ),
-                                      onTap: () async {
-                                        await authProvider.authService
-                                            .signOut();
-                                        Navigator.pushNamed(
-                                            context, OAppRoutes.splash);
-                                      })),
-                              Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  child: OGlassMorphism(
-                                    width: MediaQuery.of(context).size.width,
-                                    blur: 1,
-                                    color: OAppColors.black,
-                                    opacity: 0.1,
-                                    // margin: const EdgeInsets.symmetric(
-                                    //     horizontal: 12.0, vertical: 12.0),
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0, vertical: 12.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                height: 18,
-                                                width: 25,
-                                                decoration: BoxDecoration(
-                                                    color: red,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5.0)),
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              Oheader(
-                                                overflow: TextOverflow.ellipsis,
-                                                text:
-                                                    "${homeProvider.topRatingMovies?.results?[currentPage].voteAverage}",
-                                                glow: true,
-                                                fontSize: 14,
-                                                color: OAppColors.white,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Oheader(
-                                            overflow: TextOverflow.ellipsis,
-                                            text: homeProvider
-                                                    .topRatingMovies
-                                                    ?.results?[currentPage]
-                                                    .title ??
-                                                '',
-                                            glow: true,
-                                            fontSize: 24,
-                                            color: OAppColors.white,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Obutton(
-                                                text: "Watch Now",
-                                                color: OAppColors.secondry2,
-                                                onPressed: () {
-                                                  // homeProvider.saveLikeGenre();
-                                                },
-                                                textColor: Colors.white,
-                                                borderRadius: 52.0,
-                                                // padding: const EdgeInsets.symmetric(
-                                                //     horizontal: 12.0, vertical: 12.0),
-                                                width: 200,
-                                                height: 45,
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              OiconButtons(
-                                                  child: const Icon(
-                                                    Icons
-                                                        .bookmark_border_rounded,
-                                                    size: 20,
-                                                    color: Colors
-                                                        .white, // White icon color for contrast
-                                                  ),
-                                                  onTap: () {})
-                                            ],
-                                          )
-                                        ],
-                                      ),
+                                top: 50,
+                                right: 10,
+                                child: OiconButtons(
+                                    child: const Icon(
+                                      Icons.logout,
+                                      color: OAppColors.white,
+                                      size: 13,
                                     ),
-                                  )),
+                                    onTap: () async {
+                                      await authProvider.authService.signOut();
+                                      Navigator.pushNamed(
+                                          context, OAppRoutes.splash);
+                                    }),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                child: OGlassMorphism(
+                                  width: MediaQuery.of(context).size.width,
+                                  blur: 1,
+                                  color: OAppColors.black,
+                                  opacity: 0.1,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 12.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height: 18,
+                                              width: 25,
+                                              decoration: BoxDecoration(
+                                                  color: red,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.0)),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Oheader(
+                                              overflow: TextOverflow.ellipsis,
+                                              text:
+                                                  "${homeProvider.topRatingMovies[currentPage].voteAverage}",
+                                              glow: true,
+                                              fontSize: 14,
+                                              color: OAppColors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Oheader(
+                                          overflow: TextOverflow.ellipsis,
+                                          text: homeProvider
+                                                  .topRatingMovies[currentPage]
+                                                  .title ??
+                                              '',
+                                          glow: true,
+                                          fontSize: 20,
+                                          color: OAppColors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Obutton(
+                                              text: "Watch Now",
+                                              color: OAppColors.secondry2,
+                                              onPressed: () {},
+                                              textColor: Colors.white,
+                                              borderRadius: 62.0,
+                                              width: 160,
+                                              height: 35,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            OiconButtons(
+                                                child: const Icon(
+                                                  Icons.bookmark_border_rounded,
+                                                  size: 20,
+                                                  color: Colors.white,
+                                                ),
+                                                onTap: () {}),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          homeProvider.topRatingMovies?.results?.isNotEmpty ??
-                                  false
+                          const SizedBox(height: 5),
+                          homeProvider.topRatingMovies.isNotEmpty
                               ? SizedBox(
-                                  height: 75,
+                                  height: 65,
                                   child: PageView.builder(
                                     controller: _pageController,
                                     scrollDirection: Axis.horizontal,
@@ -287,19 +281,454 @@ class _MainContentState extends State<MainContent> {
                                       });
                                     },
                                     itemCount: homeProvider
-                                            .topRatingMovies?.results?.length ??
-                                        0,
+                                            .topRatingMovies.length +
+                                        (homeProvider.hasMoreTopMovies ? 1 : 0),
                                     itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2.0, horizontal: 5.0),
-                                        child: Container(
-                                          width: 50,
-                                          decoration: BoxDecoration(
-                                              color: const Color.fromRGBO(
-                                                  34, 68, 131, 0.698),
+                                      if (index <
+                                          homeProvider.topRatingMovies.length) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pushNamed(
+                                                    OAppRoutes.moviedetail,
+                                                    arguments: homeProvider
+                                                        .topRatingMovies[index]
+                                                        .id);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 2.0, horizontal: 5.0),
+                                            child: Container(
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                      34, 68, 131, 0.698),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          7.0)),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(7.0),
+                                                child: CachedNetworkImage(
+                                                  progressIndicatorBuilder:
+                                                      (context, url,
+                                                              progress) =>
+                                                          Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            value: progress
+                                                                .progress),
+                                                  ),
+                                                  errorWidget:
+                                                      (context, url, error) {
+                                                    return Image.asset(
+                                                      OImage.defaultImage,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
+                                                  fadeInDuration:
+                                                      const Duration(
+                                                          milliseconds: 300),
+                                                  fadeOutDuration:
+                                                      const Duration(
+                                                          milliseconds: 300),
+                                                  imageUrl:
+                                                      "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies?[index].posterPath}",
+                                                  fit: BoxFit.fitWidth,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                              color: OAppColors.green),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          const SizedBox(height: 5),
+                          if (homeProvider.topRatingMovies.isNotEmpty &&
+                              currentPage >= 0 &&
+                              currentPage <
+                                  homeProvider.topRatingMovies.length) ...[
+                            Center(
+                              child: SizedBox(
+                                width: 120,
+                                child: PageViewDotIndicator(
+                                  currentItem: currentPage,
+                                  count:
+                                      homeProvider.topRatingMovies?.length ?? 0,
+                                  unselectedColor: OAppColors.darkBlue,
+                                  selectedColor: OAppColors.secondary,
+                                  boxShape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(7.0),
+                                  size: const Size(20.0, 5.0),
+                                  unselectedSize: const Size(18.0, 5.0),
+                                  duration: const Duration(milliseconds: 300),
+                                  onItemClicked: (index) {
+                                    _pageController.animateToPage(index,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ] else ...[
+                            const Center(
+                              child: Icon(
+                                Icons.add,
+                                size: 12,
+                                color: OAppColors.white,
+                              ),
+                            )
+                          ]
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    // For You Section
+                    SizedBox(
+                      height: 221,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Oheader(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: 'For You',
+                                  glow: true,
+                                  fontSize: 18,
+                                  color: OAppColors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                        context, OAppRoutesHome.foryouMovies);
+                                  },
+                                  child: const Oheader(
+                                    overflow: TextOverflow.ellipsis,
+                                    text: "See All",
+                                    fontSize: 14,
+                                    color: OAppColors.secondary,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            SizedBox(
+                              height: 180,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: homeProvider.foryou.length +
+                                    (homeProvider.hasMoreTopMovies ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index < homeProvider.foryou.length) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Oshowlog1(homeProvider.foryou[index]
+                                            .toJson()
+                                            .toString());
+
+                                        Navigator.of(context,
+                                                rootNavigator: true)
+                                            .pushNamed(OAppRoutes.moviedetail,
+                                                arguments: homeProvider
+                                                    .foryou[index].id);
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 7.0, vertical: 0.0),
+                                            width: 115,
+                                            decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(7.0)),
+                                                  BorderRadius.circular(7.0),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(7.0),
+                                              child: CachedNetworkImage(
+                                                progressIndicatorBuilder:
+                                                    (context, url, progress) =>
+                                                        Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: progress.progress,
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) {
+                                                  return Image.asset(
+                                                    OImage.defaultImage,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                                fadeInDuration: const Duration(
+                                                    milliseconds: 300),
+                                                fadeOutDuration: const Duration(
+                                                    milliseconds: 300),
+                                                imageUrl:
+                                                    "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.foryou[index].posterPath}",
+                                                fit: BoxFit.fitWidth,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            left: 12,
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  height: 18,
+                                                  width: 25,
+                                                  decoration: BoxDecoration(
+                                                      color: red,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5.0)),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Oheader(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  text:
+                                                      "${homeProvider.foryou[index].voteAverage}",
+                                                  glow: true,
+                                                  fontSize: 14,
+                                                  color: OAppColors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: red,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Categories
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Oheader(
+                              overflow: TextOverflow.ellipsis,
+                              text: 'Categories',
+                              fontSize: 18,
+                              glow: true,
+                              color: OAppColors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+
+                            /// UnSize Boxes
+                            OGridViewUnequal(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              items: 6,
+                              builder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Oshowlog1(
+                                        "Categorie clicked ${homeProvider.likeMovieModel?.genres?[index]}");
+
+                                    Navigator.pushNamed(
+                                        context, OAppRoutesHome.categorizemovie,
+                                        arguments: homeProvider
+                                            .likeMovieModel?.genres?[index]);
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        child: SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.48,
+                                          height: (index % 5 + 2) * 30,
+                                          child: Image.asset(
+                                            homeProvider?.likeMovieModel
+                                                    ?.genre_images[index] ??
+                                                OImage.defaultImage,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 5,
+                                        left: 8,
+                                        child: OGlassMorphism(
+                                          blur: 1,
+                                          color: OAppColors.black,
+                                          opacity: 0.6,
+                                          borderRadius:
+                                              BorderRadius.circular(7.0),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 7.0, vertical: 1.0),
+                                            child: Oheader(
+                                              overflow: TextOverflow.ellipsis,
+                                              text:
+                                                  '${homeProvider.likeMovieModel?.genres?[index]?.name}'
+                                                      .toUpperCase(),
+                                              fontSize: 10,
+                                              color: OAppColors.white,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    //// Now Playing In threaters
+                    SizedBox(
+                      height: 221,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Hero(
+                                      transitionOnUserGestures: true,
+                                      tag: "nowPlaying",
+                                      child: Oheader(
+                                        overflow: TextOverflow.ellipsis,
+                                        text: 'Now Playing',
+                                        glow: true,
+                                        fontSize: 18,
+                                        color: OAppColors.white,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Oheader(
+                                        overflow: TextOverflow.ellipsis,
+                                        text:
+                                            '${homeProvider.maximumDate} - ${homeProvider.minimumDate}',
+                                        fontSize: 10,
+                                        glow: false,
+                                        color: OAppColors.lightgray,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                        context, OAppRoutesHome.allMovies);
+                                  },
+                                  child: const Oheader(
+                                    overflow: TextOverflow.ellipsis,
+                                    text: "See All",
+                                    fontSize: 14,
+                                    color: OAppColors.secondary,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            SizedBox(
+                              height: 180,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: homeProvider.nowPlayingMovies.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Oshowlog1(homeProvider.foryou[index]
+                                          .toJson()
+                                          .toString());
+
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pushNamed(OAppRoutes.moviedetail,
+                                              arguments: homeProvider
+                                                  .nowPlayingMovies[index].id);
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 7.0),
+                                          width: 115,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(7.0),
+                                          ),
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(7.0),
@@ -324,175 +753,42 @@ class _MainContentState extends State<MainContent> {
                                               fadeOutDuration: const Duration(
                                                   milliseconds: 300),
                                               imageUrl:
-                                                  "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.topRatingMovies?.results?[index].posterPath}",
+                                                  "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies[index].posterPath}",
                                               fit: BoxFit.fitWidth,
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          if (homeProvider.topRatingMovies?.results != null &&
-                              homeProvider
-                                  .topRatingMovies!.results!.isNotEmpty &&
-                              currentPage >= 0 &&
-                              currentPage <
-                                  homeProvider
-                                      .topRatingMovies!.results!.length) ...[
-                            Center(
-                              child: SizedBox(
-                                width: 120,
-                                child: PageViewDotIndicator(
-                                  currentItem: currentPage,
-                                  count: homeProvider
-                                          .topRatingMovies?.results?.length ??
-                                      0,
-                                  unselectedColor: OAppColors.darkBlue,
-                                  selectedColor: OAppColors.secondary,
-                                  boxShape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(7.0),
-                                  size: const Size(20.0, 5.0),
-                                  unselectedSize: const Size(18.0, 5.0),
-                                  duration: const Duration(milliseconds: 300),
-                                  onItemClicked: (index) {
-                                    // int targetPage = startIndex + index;
-                                    _pageController.animateToPage(index,
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        curve: Curves.easeInOut);
-                                  },
-                                ),
-                              ),
-                            ),
-                          ] else ...[
-                            const Center(
-                              child: Icon(
-                                Icons.add,
-                                size: 12,
-                                color: OAppColors.white,
-                              ),
-                            )
-                          ]
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    // For You Section
-                    SizedBox(
-                      height: 255,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Oheader(
-                                  overflow: TextOverflow.ellipsis,
-                                  text: 'For You',
-                                  glow: true,
-                                  fontSize: 22,
-                                  color: OAppColors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                                Oheader(
-                                  overflow: TextOverflow.ellipsis,
-                                  text: "See All",
-                                  fontSize: 18,
-                                  color: OAppColors.secondary,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount:
-                                    homeProvider?.nowPlayingMovies?.length ?? 0,
-                                itemBuilder: (context, index) {
-                                  return Stack(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 7.0),
-                                        width: 145,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          color: red,
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          child: CachedNetworkImage(
-                                            progressIndicatorBuilder:
-                                                (context, url, progress) =>
-                                                    Center(
-                                              child: CircularProgressIndicator(
-                                                value: progress.progress,
+                                        Positioned(
+                                          top: 5,
+                                          left: 12,
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 18,
+                                                width: 25,
+                                                decoration: BoxDecoration(
+                                                    color: red,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5.0)),
                                               ),
-                                            ),
-                                            errorWidget: (context, url, error) {
-                                              return Image.asset(
-                                                OImage.defaultImage,
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                            fadeInDuration: const Duration(
-                                                milliseconds: 300),
-                                            fadeOutDuration: const Duration(
-                                                milliseconds: 300),
-                                            imageUrl:
-                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?[index].posterPath}",
-                                            fit: BoxFit.fitWidth,
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Oheader(
+                                                overflow: TextOverflow.ellipsis,
+                                                text:
+                                                    "${homeProvider.nowPlayingMovies?[index].voteAverage}",
+                                                glow: true,
+                                                fontSize: 14,
+                                                color: OAppColors.white,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        top: 5,
-                                        left: 12,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              height: 18,
-                                              width: 25,
-                                              decoration: BoxDecoration(
-                                                  color: red,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          5.0)),
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Oheader(
-                                              overflow: TextOverflow.ellipsis,
-                                              text:
-                                                  "${homeProvider.nowPlayingMovies?[index].voteAverage}",
-                                              glow: true,
-                                              fontSize: 14,
-                                              color: OAppColors.white,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   );
                                 },
                               ),
@@ -501,102 +797,12 @@ class _MainContentState extends State<MainContent> {
                         ),
                       ),
                     ),
-
-                    // Categories
                     const SizedBox(
-                      height: 10,
+                      height: 5,
                     ),
+                    //// Now Playing In TV
                     SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Oheader(
-                                  overflow: TextOverflow.ellipsis,
-                                  text: 'Categories',
-                                  glow: true,
-                                  fontSize: 22,
-                                  color: OAppColors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                                Oheader(
-                                  overflow: TextOverflow.ellipsis,
-                                  text: "See All",
-                                  fontSize: 18,
-                                  color: OAppColors.secondary,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-
-                            /// UnSize Boxes
-                            OGridViewUnequal(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              items: 6,
-                              builder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.48,
-                                      height: (index % 5 + 2) *
-                                          30, // Random heights for demonstration
-                                      child: Image.asset(
-                                        homeProvider?.likeMovieModel
-                                                ?.genre_images[index] ??
-                                            OImage.defaultImage,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 5,
-                                      left: 8,
-                                      child: OGlassMorphism(
-                                        blur: 1,
-                                        color: OAppColors.black,
-                                        opacity: 0.6,
-                                        borderRadius:
-                                            BorderRadius.circular(7.0),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5.0, vertical: 1.0),
-                                          child: Oheader(
-                                            overflow: TextOverflow.ellipsis,
-                                            text:
-                                                '${homeProvider.likeMovieModel?.genres?[index]?.name}'
-                                                    .toUpperCase(),
-                                            fontSize: 14,
-                                            color: OAppColors.white,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    //// Now Playing In threaters
-                    SizedBox(
-                      height: 255,
+                      height: 221,
                       width: MediaQuery.of(context).size.width,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -607,52 +813,22 @@ class _MainContentState extends State<MainContent> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Hero(
-                                      transitionOnUserGestures: true,
-                                      tag: "nowPlaying",
-                                      child: Oheader(
-                                        overflow: TextOverflow.ellipsis,
-                                        text: 'Now Playing',
-                                        glow: true,
-                                        fontSize: 22,
-                                        color: OAppColors.white,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4.0),
-                                      child: Oheader(
-                                        overflow: TextOverflow.ellipsis,
-                                        text:
-                                            '(${homeProvider?.minimumDate} - ${homeProvider?.maximumDate})',
-                                        glow: true,
-                                        fontSize: 12,
-                                        color:
-                                            OAppColors.white.withOpacity(0.5),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 5,
+                                const Oheader(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: 'Now on TV',
+                                  glow: true,
+                                  fontSize: 18,
+                                  color: OAppColors.white,
+                                  fontWeight: FontWeight.w800,
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(
-                                        context, OAppRoutesHome.allMovies);
+                                    homeProvider.selectScreen(2);
                                   },
                                   child: const Oheader(
                                     overflow: TextOverflow.ellipsis,
                                     text: "See All",
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: OAppColors.secondary,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -663,77 +839,123 @@ class _MainContentState extends State<MainContent> {
                               height: 15,
                             ),
                             SizedBox(
-                              height: 200,
+                              height: 160,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount:
-                                    homeProvider?.nowPlayingMovies?.length ?? 0,
+                                itemCount: homeProvider
+                                        .nowPlayingTv?.results?.length ??
+                                    0,
                                 itemBuilder: (context, index) {
-                                  return Stack(
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 7.0),
-                                        width: 145,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          color: red,
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(7.0),
-                                          child: CachedNetworkImage(
-                                            progressIndicatorBuilder:
-                                                (context, url, progress) =>
-                                                    Center(
-                                              child: CircularProgressIndicator(
-                                                value: progress.progress,
+                                      SizedBox(
+                                        height: 120,
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 7.0),
+                                              width: 220,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(7.0),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(7.0),
+                                                child: CachedNetworkImage(
+                                                  progressIndicatorBuilder:
+                                                      (context, url,
+                                                              progress) =>
+                                                          Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      value: progress.progress,
+                                                    ),
+                                                  ),
+                                                  errorWidget:
+                                                      (context, url, error) {
+                                                    return Image.asset(
+                                                      OImage.defaultImage,
+                                                      fit: BoxFit.fill,
+                                                    );
+                                                  },
+                                                  fadeInDuration:
+                                                      const Duration(
+                                                          milliseconds: 300),
+                                                  fadeOutDuration:
+                                                      const Duration(
+                                                          milliseconds: 300),
+                                                  imageUrl:
+                                                      "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingTv?.results?[index].backdropPath}",
+                                                  fit: BoxFit.fitWidth,
+                                                ),
                                               ),
                                             ),
-                                            errorWidget: (context, url, error) {
-                                              return Image.asset(
-                                                OImage.defaultImage,
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                            fadeInDuration: const Duration(
-                                                milliseconds: 300),
-                                            fadeOutDuration: const Duration(
-                                                milliseconds: 300),
-                                            imageUrl:
-                                                "${OAppEndPoints.baseUrlfromDBImage}${homeProvider.nowPlayingMovies?[index].posterPath}",
-                                            fit: BoxFit.fitWidth,
+                                            Positioned(
+                                              top: 5,
+                                              left: 12,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    height: 18,
+                                                    width: 25,
+                                                    decoration: BoxDecoration(
+                                                        color: red,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5.0)),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Oheader(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    text:
+                                                        "${homeProvider.nowPlayingTv?.results?[index].voteAverage}",
+                                                    glow: true,
+                                                    fontSize: 14,
+                                                    color: OAppColors.white,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: SizedBox(
+                                          height: 20,
+                                          child: Oheader(
+                                            overflow: TextOverflow.ellipsis,
+                                            text:
+                                                "${homeProvider.nowPlayingTv?.results?[index].name}",
+                                            fontSize: 16,
+                                            color: OAppColors.white,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
-                                      Positioned(
-                                        top: 5,
-                                        left: 12,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              height: 18,
-                                              width: 25,
-                                              decoration: BoxDecoration(
-                                                  color: red,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          5.0)),
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Oheader(
-                                              overflow: TextOverflow.ellipsis,
-                                              text:
-                                                  "${homeProvider.nowPlayingMovies?[index].voteAverage}",
-                                              glow: true,
-                                              fontSize: 14,
-                                              color: OAppColors.white,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ],
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: SizedBox(
+                                          height: 15,
+                                          child: Oheader(
+                                            overflow: TextOverflow.ellipsis,
+                                            text:
+                                                "${homeProvider.nowPlayingTv?.results?[index].firstAirDate}",
+                                            fontSize: 12,
+                                            color: OAppColors.lightgray,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                     ],

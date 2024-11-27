@@ -2,54 +2,25 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ogo/core/constants/api_endpoints.dart';
 import 'package:ogo/core/constants/assets.dart';
+import 'package:ogo/features/homepage/models/top_rating_movies_model.dart';
 import 'package:ogo/features/homepage/provider/home_page_provider.dart';
 import 'package:ogo/routes/app_routes.dart';
 import 'package:ogo/shared/widgets/custom_header.dart';
-import 'package:ogo/shared/widgets/custom_log.dart';
-import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
 import '../../../core/constants/colors.dart';
 
-class AllMovies extends StatefulWidget {
-  const AllMovies({super.key});
+class ForYouMovies extends StatefulWidget {
+  const ForYouMovies({super.key});
 
   @override
-  State<AllMovies> createState() => _AllMoviesState();
+  State<ForYouMovies> createState() => _ForYouMoviesState();
 }
 
-class _AllMoviesState extends State<AllMovies> {
-  final ScrollController scrollController = ScrollController();
-
+class _ForYouMoviesState extends State<ForYouMovies> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<HomePageProvider>(context, listen: false);
-
-    // Load the initial set of movies
-    // provider.getNowPlayingMovies(pageNumber: provider.currentPage + 1);
-
-    // Add scroll listener for infinite scrolling
-    provider.getNowPlayingMovies(pageNumber: 1);
-
-    scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-              scrollController.position.maxScrollExtent &&
-          provider.hasMoreNowPlaying &&
-          !provider.nowplayingmovieload) {
-        provider
-            .getNowPlayingMovies(pageNumber: provider.incrementPageCount())
-            .whenComplete(
-              () => Oshowlog1("Completed Loading NEw Data "),
-            );
-        setState(() {});
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    scrollController.dispose(); // Dispose the ScrollController
-    super.dispose();
   }
 
   @override
@@ -58,7 +29,7 @@ class _AllMoviesState extends State<AllMovies> {
       backgroundColor: OAppColors.primary,
       body: Consumer<HomePageProvider>(builder: (context, provider, _) {
         return CustomScrollView(
-          controller: scrollController, // Attach ScrollController here
+          // Attach ScrollController here
           slivers: [
             // Sliver App Bar
             SliverAppBar(
@@ -77,7 +48,7 @@ class _AllMoviesState extends State<AllMovies> {
                 title: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 18.0),
                   child: Oheader(
-                    text: 'Now Playing',
+                    text: 'Trending for You',
                     fontSize: 22,
                     glow: true,
                     lines: 2,
@@ -100,12 +71,12 @@ class _AllMoviesState extends State<AllMovies> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    if (index < provider.nowPlayingMovies.length) {
+                    if (index < provider.foryou.length) {
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context, rootNavigator: true).pushNamed(
+                        onTap: (){
+                           Navigator.of(context, rootNavigator: true).pushNamed(
                               OAppRoutes.moviedetail,
-                              arguments: provider.nowPlayingMovies[index].id);
+                              arguments: provider.foryou[index].id);
                         },
                         child: Stack(
                           children: [
@@ -128,12 +99,11 @@ class _AllMoviesState extends State<AllMovies> {
                                     height: 400,
                                   );
                                 },
-                                fadeInDuration:
-                                    const Duration(milliseconds: 300),
+                                fadeInDuration: const Duration(milliseconds: 300),
                                 fadeOutDuration:
                                     const Duration(milliseconds: 300),
                                 imageUrl:
-                                    "${OAppEndPoints.baseUrlfromDBImage}${provider.nowPlayingMovies[index].posterPath}",
+                                    "${OAppEndPoints.baseUrlfromDBImage}${provider.foryou[index].posterPath}",
                                 fit: BoxFit.fill,
                               ),
                             ),
@@ -147,16 +117,14 @@ class _AllMoviesState extends State<AllMovies> {
                                     width: 25,
                                     decoration: BoxDecoration(
                                         color: red,
-                                        borderRadius:
-                                            BorderRadius.circular(5.0)),
+                                        borderRadius: BorderRadius.circular(5.0)),
                                   ),
                                   const SizedBox(
                                     width: 5,
                                   ),
                                   Oheader(
                                     overflow: TextOverflow.ellipsis,
-                                    text:
-                                        "${provider.nowPlayingMovies[index].voteAverage}",
+                                    text: "${provider.foryou[index].voteAverage}",
                                     glow: true,
                                     fontSize: 14,
                                     color: OAppColors.white,
@@ -177,7 +145,7 @@ class _AllMoviesState extends State<AllMovies> {
                       );
                     }
                   },
-                  childCount: provider.nowPlayingMovies.length +
+                  childCount: provider.foryou.length +
                       (provider.hasMoreNowPlaying ? 1 : 0),
                 ),
               ),
