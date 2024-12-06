@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 import 'package:ogo/core/constants/colors.dart';
-import 'package:ogo/core/services/local_storage_service.dart';
+
 
 import 'package:ogo/features/authentication/providers/auth_service_provider.dart';
 import 'package:ogo/features/homepage/provider/home_page_provider.dart';
-import 'package:ogo/features/homepage/ui/all_movies.dart';
+
 import 'package:ogo/features/homepage/widgets/like_movie_list.dart';
-import 'package:ogo/features/homepage/widgets/main_content.dart';
+
 
 import 'package:ogo/routes/app_routes.dart';
 import 'package:ogo/routes/app_routes_home.dart';
 import 'package:ogo/shared/widgets/custom_bottom_navigation.dart';
-import 'package:ogo/shared/widgets/custom_button.dart';
+
 import 'package:ogo/shared/widgets/custom_glass_morphism.dart';
 import 'package:ogo/shared/widgets/custom_header.dart';
 import 'package:ogo/shared/widgets/custom_icon_button.dart';
-import 'package:ogo/shared/widgets/custom_log.dart';
+
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

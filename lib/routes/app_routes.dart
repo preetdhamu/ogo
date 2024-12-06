@@ -7,6 +7,7 @@ import 'package:ogo/features/homepage/ui/home_page.dart';
 import 'package:ogo/features/authentication/ui/splash_screen.dart';
 import 'package:ogo/features/homepage/ui/movie_details.dart';
 import 'package:ogo/shared/widgets/custom_log.dart';
+import 'package:ogo/shared/widgets/custom_video_player.dart';
 import 'package:ogo/shared/widgets/custom_youtube_video_player.dart';
 
 class OAppRoutes {
@@ -18,6 +19,7 @@ class OAppRoutes {
   static const test = '/test';
   static const moviedetail = '/moviedetail';
   static const youtubePlayer = '/youtubePlayer';
+  static const customPlayer = '/customPlayer';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -30,12 +32,21 @@ class OAppRoutes {
       case homepage:
         return MaterialPageRoute(builder: (_) => HomePage());
       case youtubePlayer:
-        String videoId = settings.arguments as String ;
-        return MaterialPageRoute(builder: (_) => CustomYoutubeVideoPlayer(videoId: videoId,));
+        String videoId = settings.arguments as String;
+        return MaterialPageRoute(
+            builder: (_) => CustomYoutubeVideoPlayer(
+                  videoId: videoId,
+                ));
+      case customPlayer:
+        Map movie = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (_) => CustomVideoPlayer(
+                  movie: movie,
+                ));
 
       case moviedetail:
         int movieId = settings.arguments as int;
-        Oshowlog1("WOrking ?????????????????????????????????");
+
         return MaterialPageRoute(
             builder: (_) => MovieDetails(
                   movieId: movieId,

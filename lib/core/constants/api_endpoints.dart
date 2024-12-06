@@ -1,7 +1,15 @@
 class OAppEndPoints {
-  static const String baseUrl = 'http://192.168.1.37:8000/api';
+
+  static const String mainbaseUrl = 'http://192.168.1.37:8000';
+  // static const String mainbaseUrl = 'http://172.20.10.5:8000';
+
+
+  // static const String mainbaseUrl = 'http://192.168.43.154:8000';
+  static const String baseUrl = '$mainbaseUrl/api';
+  
+  
   // static const String baseUrl = 'http://172.20.10.5:8000/api';
-  // static const String baseUrl = 'http://192.168.116.154:8000/api';
+  
   static const String baseUrlfromDB = 'https://api.themoviedb.org';
   static const String baseUrlfromDBImage = 'https://image.tmdb.org/t/p/w500';
 
@@ -24,4 +32,6 @@ class OAppEndPoints {
   static const String moviecredit = '/credits';
   static const String moviesimilar = '/similar';
   static const String moviesvideo = '/videos';
+  static const String getPlayableContent = '/video';
+
 }

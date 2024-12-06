@@ -18,6 +18,7 @@ class OAppColors {
   static const Color lightgray = Color.fromARGB(255, 133, 157, 192);
   static const Color green = Color.fromARGB(255, 38, 255, 0);
   static const Color grey = Colors.grey;
+  static const Color transparent = Colors.transparent;
   static const Color white = Color.fromARGB(255, 255, 255, 255);
   static const Color lightwhite = Color.fromRGBO(124, 138, 159, 1);
 

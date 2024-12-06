@@ -44,8 +44,7 @@ Future main() async {
           ),
         ).then(
           (value) {
-            print(
-                "Connected Successfully : ${value.isAutomaticDataCollectionEnabled}");
+            print("Connected Successfully : ${value.isAutomaticDataCollectionEnabled}");
           },
         );
       } else {

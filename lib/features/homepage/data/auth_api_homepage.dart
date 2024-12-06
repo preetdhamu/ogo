@@ -7,8 +7,10 @@ import 'package:ogo/features/homepage/models/like_movie_model.dart';
 import 'package:ogo/features/homepage/models/movie_credit_model.dart';
 import 'package:ogo/features/homepage/models/movie_detail_model.dart';
 import 'package:ogo/features/homepage/models/movie_video_model.dart';
+import 'package:ogo/features/homepage/models/new_movie_video_model.dart';
 import 'package:ogo/features/homepage/models/now_playing_movies_model.dart';
 import 'package:ogo/features/homepage/models/top_rating_movies_model.dart';
+import 'package:ogo/shared/widgets/custom_log.dart';
 
 class AuthAPIHomePage {
   static Future<Map<String, dynamic>> getAllGenre() async {
@@ -40,7 +42,8 @@ class AuthAPIHomePage {
     }
   }
 
-  static Future<Map<String, dynamic>> getAllTopRatingMovies(int pageNumber) async {
+  static Future<Map<String, dynamic>> getAllTopRatingMovies(
+      int pageNumber) async {
     final response = await http.get(
       Uri.parse('${OAppEndPoints.topRatingMovies}&page=$pageNumber'),
       headers: {
@@ -51,20 +54,21 @@ class AuthAPIHomePage {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       TopRatingMovies topRatingMovies = TopRatingMovies.fromJson(data);
-      
+
       return {
         "success": true,
         "res": topRatingMovies,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
 
-  static Future<Map<String, dynamic>> getAllNowPlayingMovies(int pageNumber) async {
+  static Future<Map<String, dynamic>> getAllNowPlayingMovies(
+      int pageNumber) async {
     final response = await http.get(
       Uri.parse('${OAppEndPoints.nowPlayingMovies}&page=$pageNumber'),
       headers: {
@@ -80,17 +84,19 @@ class AuthAPIHomePage {
         "success": true,
         "res": nowPlayingMovies,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
-  static Future<Map<String, dynamic>> getCategorizedMovies(int genreId , int pageNumber) async {
+
+  static Future<Map<String, dynamic>> getCategorizedMovies(
+      int genreId, int pageNumber) async {
     final response = await http.get(
-      Uri.parse('${OAppEndPoints.categorizedMovies}&page=$pageNumber&with_genres=$genreId'),
-                                                
+      Uri.parse(
+          '${OAppEndPoints.categorizedMovies}&page=$pageNumber&with_genres=$genreId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${OAppConstants.tvdbKey}',
@@ -104,13 +110,40 @@ class AuthAPIHomePage {
         "success": true,
         "res": categorizedMovies,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
+
+  static Future<Map<String, dynamic>> getPlayableContent(int id) async {
+    final response = await http.get(
+      Uri.parse(
+          '${OAppEndPoints.baseUrl}${OAppEndPoints.getPlayableContent}/$id/'),
+
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   'Authorization': 'Bearer ${OAppConstants.tvdbKey}',
+      // },
+    );
+    if (response.statusCode == 200) {
+       final data = jsonDecode(response.body);
+      MovieContent content = MovieContent.fromJson(data['result']);
+      
+      return {
+        "success": true,
+        "res": content,
+      };
+    } else {
+      return {
+        "success": false,
+        "res": response.body,
+      };
+    }
+  }
+
   static Future<Map<String, dynamic>> getMovieDetail(int movieId) async {
     final response = await http.get(
       Uri.parse('${OAppEndPoints.movieDetail}$movieId'),
@@ -127,17 +160,18 @@ class AuthAPIHomePage {
         "success": true,
         "res": movieDetail,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
 
   static Future<Map<String, dynamic>> getMovieCredit(int movieId) async {
     final response = await http.get(
-      Uri.parse('${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviecredit}'),
+      Uri.parse(
+          '${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviecredit}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${OAppConstants.tvdbKey}',
@@ -151,17 +185,18 @@ class AuthAPIHomePage {
         "success": true,
         "res": movieCredit,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
 
   static Future<Map<String, dynamic>> getSimilarMovie(int movieId) async {
     final response = await http.get(
-      Uri.parse('${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviesimilar}'),
+      Uri.parse(
+          '${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviesimilar}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${OAppConstants.tvdbKey}',
@@ -175,18 +210,18 @@ class AuthAPIHomePage {
         "success": true,
         "res": moviesimilar,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }
 
-
   static Future<Map<String, dynamic>> getMovieVideo(int movieId) async {
     final response = await http.get(
-      Uri.parse('${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviesvideo}'),
+      Uri.parse(
+          '${OAppEndPoints.movieDetail}$movieId${OAppEndPoints.moviesvideo}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${OAppConstants.tvdbKey}',
@@ -200,10 +235,10 @@ class AuthAPIHomePage {
         "success": true,
         "res": movieVideo,
       };
-    }else{
+    } else {
       return {
-        "success":false,
-        "res":response.body,
+        "success": false,
+        "res": response.body,
       };
     }
   }

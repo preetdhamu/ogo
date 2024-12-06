@@ -69,6 +69,7 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   iconsax: ^0.0.8
   youtube_player_flutter: ^8.1.2
+  video_player: ^2.9.2
   
 
 

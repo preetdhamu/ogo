@@ -10,6 +10,7 @@ import 'package:ogo/features/homepage/models/movie_credit_model.dart';
 import 'package:ogo/features/homepage/models/movie_detail_model.dart';
 import 'package:ogo/features/homepage/models/movie_video_model.dart'
     hide Results;
+import 'package:ogo/features/homepage/models/new_movie_video_model.dart';
 import 'package:ogo/features/homepage/models/now_playing_movies_model.dart';
 import 'package:ogo/features/homepage/models/top_rating_movies_model.dart';
 import 'package:ogo/features/tv/data/auth_api_tv.dart';
@@ -44,6 +45,7 @@ class HomePageProvider extends ChangeNotifier {
   MovieVideoModel? movieVideoModel;
 
   AuthServiceProvider? authServiceProvider;
+  MovieContent? maincontent;
   // loading(bool value) {
   //   load = value;
   //   notifyListeners();
@@ -429,7 +431,8 @@ class HomePageProvider extends ChangeNotifier {
     notifyListeners(); // Start loading
 
     try {
-      Map allgenre = await AuthAPIHomePage.getCategorizedMovies(genreId , pageNumber);
+      Map allgenre =
+          await AuthAPIHomePage.getCategorizedMovies(genreId, pageNumber);
       if (allgenre['success'] == true) {
         TopRatingMovies data = allgenre['res'];
 
@@ -454,6 +457,33 @@ class HomePageProvider extends ChangeNotifier {
       Oshowlog("Categorized Movie Error:", e.toString());
     } finally {
       categorizeMovieload = false;
+      notifyListeners();
+      Oshowlog1("Appi completed processing ");
+      notifyListeners();
+    }
+  }
+
+  bool hasPlayableContent = false;
+  Future<void> getPlayableContent(int id) async {
+    hasPlayableContent = true;
+    notifyListeners(); // Start loading
+
+    try {
+      Map allgenre = await AuthAPIHomePage.getPlayableContent(id);
+      if (allgenre['success'] == true) {
+        maincontent = allgenre['res'];
+        Oshowlog(allgenre['res'].toString(), "Movie Playing Video Loading ");
+      } else {
+        Oshowlog1(allgenre['res'].toString());
+        maincontent = null;
+
+        /// what to do here
+        throw Exception("Video not found $id ");
+      }
+    } catch (e) {
+      Oshowlog("Movie Playing Video Error:", e.toString());
+    } finally {
+      hasPlayableContent = false;
       notifyListeners();
       Oshowlog1("Appi completed processing ");
       notifyListeners();

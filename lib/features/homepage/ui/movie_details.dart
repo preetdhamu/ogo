@@ -7,6 +7,7 @@ import 'package:ogo/features/homepage/provider/home_page_provider.dart';
 import 'package:ogo/features/homepage/ui/movie_about.dart';
 import 'package:ogo/features/homepage/ui/movie_similar_list.dart';
 import 'package:ogo/features/homepage/ui/movie_trailers_list.dart';
+import 'package:ogo/routes/app_routes.dart';
 import 'package:ogo/shared/widgets/custom_button.dart';
 import 'package:ogo/shared/widgets/custom_glass_morphism.dart';
 import 'package:ogo/shared/widgets/custom_header.dart';
@@ -194,7 +195,29 @@ class _MovieDetailsState extends State<MovieDetails> {
                                           Obutton(
                                             text: "Watch Now",
                                             color: OAppColors.secondry2,
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              if (provider.movieDetail?.id !=
+                                                  null) {
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pushNamed(
+                                                  OAppRoutes.customPlayer,
+                                                  arguments:
+                                                  {
+                                                    "movieid":provider.movieDetail!.id ,
+                                                    "movieName":provider.movieDetail!.title
+                                                  }
+                                                      ,
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Movie ID not available")),
+                                                );
+                                              }
+                                            },
                                             textColor: Colors.white,
                                             borderRadius: 62.0,
                                             width: 160,
