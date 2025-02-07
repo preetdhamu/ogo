@@ -141,6 +141,35 @@ lib/
   flutter run
 ## 📸 Screenshots
  .....
+![Image](https://github.com/user-attachments/assets/567a0eba-3fdd-4667-96c5-6090728a69cf)
+
+![Image](https://github.com/user-attachments/assets/a084fae5-d133-4af9-9b35-3fe9aae15f40)
+
+![Image](https://github.com/user-attachments/assets/f8ae3d61-cb9c-4ee3-b801-49d1206fd9b9)
+
+![Image](https://github.com/user-attachments/assets/c7beeea6-b403-4af2-841d-21cbcca4f9b7)
+
+![Image](https://github.com/user-attachments/assets/45bb371d-c637-4f33-a692-d8b31da9b6a0)
+
+![Image](https://github.com/user-attachments/assets/543c538b-5160-4414-a0f4-42b11cf47e6c)
+
+![Image](https://github.com/user-attachments/assets/bb21b605-5689-40c1-b256-63f31ab3a739)
+
+![Image](https://github.com/user-attachments/assets/345afc70-a47b-47f0-9d68-a9491b102262)
+
+![Image](https://github.com/user-attachments/assets/cef6e7ca-516a-490f-9173-2f633d452d59)
+
+![Image](https://github.com/user-attachments/assets/fb2ef844-208a-46d1-b950-dbdfa8b767c0)
+
+![Image](https://github.com/user-attachments/assets/e2f498b4-8127-42f6-a2f6-066661bc3e7d)
+
+![Image](https://github.com/user-attachments/assets/34b658c9-d3b3-412f-b098-5af4a3169c85)
+
+![Image](https://github.com/user-attachments/assets/bf0f4005-e2b4-4e26-9729-848a44f62a62)
+
+![Image](https://github.com/user-attachments/assets/64d94c06-758b-4e58-baa6-112b932106f6)
+
+![Image](https://github.com/user-attachments/assets/82e1a1e8-e856-4c5d-bb33-47452f6d38c8) 
 
 ## 🌍 Contributing
 - Contributions are welcome! If you have ideas for new features, bug fixes, or improvements, feel free to fork this repository and open a pull request.
@@ -150,10 +179,10 @@ If you have any questions or feedback, feel free to reach out:
 Email: gurpreetdhamu8586@gmail.com
 
 
+REFERENCE UI -> 
 
+https://www.behance.net/gallery/198896501/Movie-Streaming-App
 
-
-
-
+Functionality Done by me for authentication i use Firebase but for Authorization i use DJANGO REST FRAMEWORK . Please connect if some issue Comes . 
 
 
